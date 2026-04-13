@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>Muzify - Premium Music Streaming</title>
+    <!-- Essential CDNs -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        background: "#05010d",
+                        primary: { DEFAULT: "#b026ff", neon: "#d400ff", glow: "#ff00ff" },
+                        secondary: { DEFAULT: "#7c3aed", glow: "#c084fc" }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background: #05010d; color: white; font-family: 'Inter', sans-serif; overflow: hidden; margin: 0; }
+        .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; transition: all 0.3s ease; }
+        .glass-panel { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(40px); border-top: 1px solid rgba(255, 255, 255, 0.05); }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .bg-glow { position: fixed; top: -10%; right: -10%; width: 50%; height: 50%; background: radial-gradient(circle, rgba(176, 38, 255, 0.15) 0%, transparent 70%); filter: blur(80px); z-index: -1; }
+        .bg-glow-2 { position: fixed; bottom: -10%; left: -10%; width: 50%; height: 50%; background: radial-gradient(circle, rgba(212, 0, 255, 0.1) 0%, transparent 70%); filter: blur(80px); z-index: -1; }
+        input[type="range"] { appearance: none; background: rgba(255,255,255,0.1); border-radius: 99px; height: 6px; }
+        input[type="range"]::-webkit-slider-thumb { appearance: none; width: 14px; height: 14px; background: white; border-radius: 50%; box-shadow: 0 0 10px rgba(176,38,255,0.8); }
+        #loading-screen { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #05010d; z-index: 1000; transition: opacity 0.5s; }
+    </style>
+</head>
+<body>
+    <div id="loading-screen">
+        <div class="flex flex-col items-center">
+            <svg viewBox="0 0 100 100" class="w-20 h-20 animate-pulse">
+                <path d="M20 80 V20 L50 50 L80 20 V80" fill="none" stroke="#b026ff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <p class="mt-4 text-primary font-bold animate-pulse">Initializing Muzify...</p>
+        </div>
+    </div>
+    <div id="root"></div>
+    <div class="bg-glow"></div>
+    <div class="bg-glow-2"></div>
+
+    <script type="text/babel">
+        // Safety checks for CDNs
+        const motion = window.Motion ? window.Motion.motion : (window.FramerMotion ? window.FramerMotion.motion : null);
+        const AnimatePresence = window.Motion ? window.Motion.AnimatePresence : (window.FramerMotion ? window.FramerMotion.AnimatePresence : null);
+        
+        if (!motion || !AnimatePresence) {
+            console.error("Framer Motion not found. Check CDN script.");
+        }
+
+        const { useState, useEffect, useRef, useMemo } = React;
+
+        const SONGS = [
+            { id: 1, title: "Bairan", artist: "Banjaare", url: "https://videotourl.com/audio/1776109481203-67d03f4c-5547-4aca-81d6-ea83452ff15c.mp3", cover: "https://pub-1407f82391df4ab1951418d04be76914.r2.dev/uploads/f12fdd3f-3153-4c4d-8fde-ae39d7cbf0f9.jpg" },
+            { id: 2, title: "Tere bin", artist: "Aviverse", url: "https://videotourl.com/audio/1776110108022-27ce4664-af77-4eee-8726-14cdc6027a64.mp3", cover: "https://pub-1407f82391df4ab1951418d04be76914.r2.dev/uploads/8297129c-065a-4090-90c9-ef156d78b142.webp" },
+            { id: 3, title: "Arz kiya hai", artist: "Anuv jain", url: "https://videotourl.com/audio/1776111879123-8b019908-8aa0-4920-82ad-614f7205ab5b.mp3", cover: "https://pub-1407f82391df4ab1951418d04be76914.r2.dev/uploads/5e5a0c56-c8a1-44c5-a50a-5687c29cd6d9.jpg" },
+            { id: 4, title: "Dooron Dooron", artist: "Paresh Pahuja", url: "https://videotourl.com/audio/1776112196382-cc7d258a-bc81-4aac-9794-5969b7185d78.mp3", cover: "https://pub-1407f82391df4ab1951418d04be76914.r2.dev/uploads/faa5ceba-c6ee-43a6-b79a-e17331baf3bb.jpg" },
+            { id: 5, title: "After Hours", artist: "The Weeknd", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3", cover: "https://images.unsplash.com/photo-1459749411177-042180ce673c?w=400" }
+        ];
+
+        const NOTIFICATIONS = [
+            { id: 1, text: "New album from The Weeknd is out!", time: "2m ago" },
+            { id: 2, text: "Your 'Chill Vibes' playlist was updated.", time: "1h ago" }
+        ];
+
+        // Robust Icon Component
+        const Icon = ({ name, size = 24, className = "", fill = "none" }) => {
+            const lucideName = name.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+            useEffect(() => { 
+                if (window.lucide) window.lucide.createIcons(); 
+            }, [name, fill]);
+            return <i data-lucide={lucideName} className={className} style={{ width: `${size}px`, height: `${size}px`, stroke: "currentColor", fill: fill === "currentColor" ? "currentColor" : fill, display: "inline-block" }}></i>;
+        };
+
+        const GlassCard = ({ children, className = "", ...props }) => (
+            <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }} className={`glass-card ${className}`} {...props}>
+                {children}
+            </motion.div>
+        );
+
+        function App() {
+            const [isAuthenticated, setIsAuthenticated] = useState(false);
+            const [activeTab, setActiveTab] = useState("home");
+            const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+            const [searchQuery, setSearchQuery] = useState("");
+            const [currentSong, setCurrentSong] = useState(SONGS[0]);
+            const [isPlaying, setIsPlaying] = useState(false);
+            const [currentTime, setCurrentTime] = useState(0);
+            const [duration, setDuration] = useState(0);
+            const [isFullPlayerOpen, setIsFullPlayerOpen] = useState(false);
+            const audioRef = useRef(new Audio());
+
+            const [likedSongs, setLikedSongs] = useState(() => {
+                const saved = localStorage.getItem('muzify_liked');
+                return saved ? JSON.parse(saved) : [];
+            });
+
+            useEffect(() => {
+                localStorage.setItem('muzify_liked', JSON.stringify(likedSongs));
+            }, [likedSongs]);
+
+            // Hide loading screen when app mounts
+            useEffect(() => {
+                const loader = document.getElementById('loading-screen');
+                if (loader) loader.style.opacity = '0';
+                setTimeout(() => loader && (loader.style.display = 'none'), 500);
+            }, []);
+
+            // Audio Logic
+            useEffect(() => {
+                const audio = audioRef.current;
+                audio.src = currentSong.url;
+                if (isPlaying) audio.play().catch(() => setIsPlaying(false));
+                
+                const updateTime = () => setCurrentTime(audio.currentTime);
+                const updateDuration = () => setDuration(audio.duration);
+                const next = () => nextSong();
+
+                audio.addEventListener('timeupdate', updateTime);
+                audio.addEventListener('loadedmetadata', updateDuration);
+                audio.addEventListener('ended', next);
+
+                return () => {
+                    audio.removeEventListener('timeupdate', updateTime);
+                    audio.removeEventListener('loadedmetadata', updateDuration);
+                    audio.removeEventListener('ended', next);
+                };
+            }, [currentSong]);
+
+            const togglePlay = (e) => {
+                if (e) e.stopPropagation();
+                if (isPlaying) {
+                    audioRef.current.pause();
+                    setIsPlaying(false);
+                } else {
+                    audioRef.current.play().catch(() => {});
+                    setIsPlaying(true);
+                }
+            };
+
+            const playSong = (song) => {
+                if (currentSong.id === song.id) togglePlay();
+                else { setCurrentSong(song); setIsPlaying(true); }
+            };
+
+            const nextSong = () => {
+                const idx = SONGS.findIndex(s => s.id === currentSong.id);
+                setCurrentSong(SONGS[(idx + 1) % SONGS.length]);
+            };
+
+            const prevSong = () => {
+                const idx = SONGS.findIndex(s => s.id === currentSong.id);
+                setCurrentSong(SONGS[(idx - 1 + SONGS.length) % SONGS.length]);
+            };
+
+            const toggleLike = (id, e) => {
+                if (e) e.stopPropagation();
+                setLikedSongs(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+            };
+
+            const filteredSongs = useMemo(() => SONGS.filter(s => 
+                s.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                s.artist.toLowerCase().includes(searchQuery.toLowerCase())
+            ), [searchQuery]);
+
+            if (!isAuthenticated) {
+                return (
+                    <div className="fixed inset-0 flex flex-col items-center justify-center p-8">
+                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center w-full max-w-md">
+                            <svg viewBox="0 0 100 100" class="w-24 h-24 mb-8 drop-shadow-[0_0_20px_#b026ff]">
+                                <path d="M20 80 V20 L50 50 L80 20 V80" fill="none" stroke="#b026ff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            <h1 class="text-4xl font-black mb-12">Muzify</h1>
+                            <button onClick={() => setIsAuthenticated(true)} class="w-full py-4 bg-white text-black rounded-2xl font-bold shadow-2xl hover:scale-105 active:scale-95 transition-transform">Continue with Email</button>
+                        </motion.div>
+                    </div>
+                );
+            }
+
+            return (
+                <div class="relative min-h-screen">
+                    <main class="max-w-lg mx-auto pb-48 pt-12 px-6 overflow-y-auto hide-scrollbar">
+                        <AnimatePresence mode="wait">
+                            <motion.div key={activeTab} initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }}>
+                                {activeTab === "home" && (
+                                    <div class="space-y-8">
+                                        <header class="flex items-center justify-between">
+                                            <h2 class="text-2xl font-black">Muzify Premium</h2>
+                                            <button onClick={() => setIsNotificationsOpen(!isNotificationsOpen)} class="p-3 glass-card relative">
+                                                <Icon name="Bell" />
+                                                <span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full shadow-[0_0_8px_#b026ff]"></span>
+                                            </button>
+                                        </header>
+                                        {isNotificationsOpen && (
+                                            <div class="glass-card p-4 space-y-2 text-sm border-primary/20">
+                                                {NOTIFICATIONS.map(n => <p key={n.id} class="border-b border-white/5 pb-2 last:border-0">{n.text}</p>)}
+                                            </div>
+                                        )}
+                                        <GlassCard className="h-48 bg-gradient-to-br from-primary/40 to-secondary/20 p-6 flex flex-col justify-end">
+                                            <h3 class="text-3xl font-black mb-4">Euphoric Dreams</h3>
+                                            <button onClick={() => playSong(SONGS[0])} class="w-max px-6 py-2 bg-white text-black rounded-full font-bold flex items-center space-x-2"><Icon name="Play" size={16} fill="currentColor" /><span>Play Now</span></button>
+                                        </GlassCard>
+                                        <section>
+                                            <h3 class="text-lg font-bold mb-4">Trending Now</h3>
+                                            <div class="flex space-x-4 overflow-x-auto hide-scrollbar pb-2">
+                                                {SONGS.map(s => (
+                                                    <div key={s.id} onClick={() => playSong(s)} class="flex-shrink-0 w-40 cursor-pointer">
+                                                        <GlassCard className="p-3 relative">
+                                                            <img src={s.cover} class="rounded-2xl mb-2 aspect-square object-cover" />
+                                                            <h4 class="font-bold text-sm truncate">{s.title}</h4>
+                                                            <p class="text-xs text-white/40">{s.artist}</p>
+                                                            <button onClick={(e) => toggleLike(s.id, e)} class="absolute top-4 right-4"><Icon name="Heart" size={16} fill={likedSongs.includes(s.id) ? "currentColor" : "none"} className={likedSongs.includes(s.id) ? "text-pink-500" : "text-white/40"} /></button>
+                                                        </GlassCard>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </section>
+                                    </div>
+                                )}
+                                {activeTab === "search" && (
+                                    <div class="space-y-6">
+                                        <h2 class="text-3xl font-black">Search</h2>
+                                        <div class="relative"><Icon name="Search" className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" /><input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 outline-none" placeholder="Songs, artists..." /></div>
+                                        <div class="space-y-2">
+                                            {filteredSongs.map(s => <div key={s.id} onClick={() => playSong(s)} class="flex items-center space-x-4 p-2 glass-card cursor-pointer"><img src={s.cover} class="w-12 h-12 rounded-xl" /><div><p class="font-bold">{s.title}</p><p class="text-xs text-white/40">{s.artist}</p></div></div>)}
+                                        </div>
+                                    </div>
+                                )}
+                                {activeTab === "library" && (
+                                    <div class="space-y-6">
+                                        <h2 class="text-3xl font-black">Library</h2>
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <GlassCard className="p-6 bg-primary/20"><Icon name="Heart" fill="currentColor" className="text-pink-500 mb-2" /><h3>Liked</h3><p class="text-xs opacity-40">{likedSongs.length} tracks</p></GlassCard>
+                                            <GlassCard className="p-6"><Icon name="ListMusic" className="text-primary mb-2" /><h3>Playlists</h3><p class="text-xs opacity-40">12 created</p></GlassCard>
+                                        </div>
+                                        {SONGS.filter(s => likedSongs.includes(s.id)).map(s => <div key={s.id} onClick={() => playSong(s)} class="flex items-center space-x-4 p-2 cursor-pointer border-b border-white/5 last:border-0"><img src={s.cover} class="w-10 h-10 rounded-lg" /><div><p class="text-sm font-bold">{s.title}</p><p class="text-xs opacity-40">{s.artist}</p></div></div>)}
+                                    </div>
+                                )}
+                                {activeTab === "profile" && (
+                                    <div class="flex flex-col items-center space-y-8">
+                                        <img src="https://i.pravatar.cc/150?u=muzify" class="w-32 h-32 rounded-full border-4 border-primary/20 p-1" />
+                                        <h2 class="text-2xl font-black">Alex Rivers</h2>
+                                        <button onClick={() => setIsAuthenticated(false)} class="w-full p-4 glass-card text-red-500 font-bold">Log Out</button>
+                                    </div>
+                                )}
+                            </motion.div>
+                        </AnimatePresence>
+                    </main>
+
+                    {/* Mini Player */}
+                    {!isFullPlayerOpen && (
+                        <div class="fixed bottom-24 left-4 right-4 z-50 max-w-lg mx-auto">
+                            <div onClick={() => setIsFullPlayerOpen(true)} class="glass-card flex items-center justify-between p-3 h-16 bg-black/80 cursor-pointer">
+                                <div class="flex items-center space-x-3 truncate">
+                                    <img src={currentSong.cover} class="w-10 h-10 rounded-lg object-cover" />
+                                    <div class="truncate leading-tight"><p class="text-sm font-bold truncate">{currentSong.title}</p><p class="text-[10px] opacity-50 truncate">{currentSong.artist}</p></div>
+                                </div>
+                                <div class="flex items-center space-x-4 pr-1">
+                                    <button onClick={(e) => toggleLike(currentSong.id, e)}><Icon name="Heart" size={20} fill={likedSongs.includes(currentSong.id) ? "currentColor" : "none"} className={likedSongs.includes(currentSong.id) ? "text-pink-500" : "text-white/30"} /></button>
+                                    <button onClick={togglePlay}><Icon name={isPlaying ? "Pause" : "Play"} size={32} fill="currentColor" /></button>
+                                </div>
+                                <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-white/10"><div class="h-full bg-primary" style={{ width: `${(currentTime/duration)*100}%` }}></div></div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Bottom Nav */}
+                    <nav class="fixed bottom-0 left-0 right-0 z-50 p-4 pb-8 glass-panel rounded-t-[32px] bg-black/80 backdrop-blur-3xl max-w-lg mx-auto">
+                        <div class="flex justify-between px-6">
+                            {['home', 'search', 'library', 'profile'].map(t => (
+                                <button key={t} onClick={() => setActiveTab(t)} class={`flex flex-col items-center space-y-1 transition-all ${activeTab === t ? "text-primary scale-110" : "text-white/30"}`}>
+                                    <Icon name={t === 'profile' ? 'User' : t.charAt(0).toUpperCase() + t.slice(1)} size={24} />
+                                    <span class="text-[9px] font-black uppercase tracking-widest">{t}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </nav>
+
+                    {/* Full Player */}
+                    <AnimatePresence>
+                        {isFullPlayerOpen && (
+                            <motion.div initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }} transition={{ type: "spring", damping: 30 }} class="fixed inset-0 z-[100] bg-background p-8 flex flex-col">
+                                <header class="flex justify-between mb-8"><button onClick={() => setIsFullPlayerOpen(false)} class="p-3 glass-card"><Icon name="ChevronDown" /></button><p class="font-black text-[10px] uppercase opacity-40 pt-4">Now Playing</p><div class="w-12"></div></header>
+                                <div class="flex-grow flex flex-col items-center justify-center">
+                                    <div class="w-full aspect-square max-w-[320px] rounded-[48px] overflow-hidden shadow-2xl mb-12 border-4 border-white/5"><img src={currentSong.cover} class="w-full h-full object-cover" /></div>
+                                    <h2 class="text-4xl font-black mb-1">{currentSong.title}</h2>
+                                    <p class="text-xl text-primary font-bold mb-12">{currentSong.artist}</p>
+                                    <div class="w-full space-y-2 mb-12">
+                                        <input type="range" min="0" max={duration || 0} value={currentTime} onChange={e => { audioRef.current.currentTime = e.target.value; setCurrentTime(e.target.value); }} class="w-full" />
+                                        <div class="flex justify-between text-[11px] font-black opacity-30"><span>{Math.floor(currentTime/60)}:{Math.floor(currentTime%60).toString().padStart(2,'0')}</span><span>{Math.floor(duration/60)}:{Math.floor(duration%60).toString().padStart(2,'0')}</span></div>
+                                    </div>
+                                    <div class="flex items-center justify-center space-x-12">
+                                        <button onClick={prevSong}><Icon name="SkipBack" size={36} fill="currentColor" /></button>
+                                        <button onClick={togglePlay} class="w-24 h-24 bg-white text-black rounded-full flex items-center justify-center shadow-2xl"><Icon name={isPlaying ? "Pause" : "Play"} size={48} fill="currentColor" className={isPlaying ? "" : "ml-2"} /></button>
+                                        <button onClick={nextSong}><Icon name="SkipForward" size={36} fill="currentColor" /></button>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
