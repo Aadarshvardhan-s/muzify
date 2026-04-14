@@ -143,6 +143,26 @@
             </motion.svg>
         );
 
+        const PlayPauseIcon = ({ isPlaying, size = 24, className = "" }) => (
+            <motion.svg 
+                key={isPlaying ? "pause" : "play"}
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.2 }}
+                viewBox="0 0 24 24" 
+                width={size} 
+                height={size} 
+                fill="currentColor"
+                className={className}
+            >
+                {isPlaying ? (
+                    <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+                ) : (
+                    <path d="M8 5v14l11-7z" />
+                )}
+            </motion.svg>
+        );
+
         function App() {
             // State Management
             const [users, setUsers] = useState(() => JSON.parse(localStorage.getItem('sunozara_users') || '{}'));
@@ -394,7 +414,10 @@
                                         )}
                                         <GlassCard className="h-48 bg-gradient-to-br from-primary/40 to-secondary/20 p-6 flex flex-col justify-end">
                                             <h3 class="text-3xl font-black mb-4">Euphoric Dreams</h3>
-                                            <button onClick={() => playSong(SONGS[0])} class="w-max px-6 py-2 bg-white text-black rounded-full font-bold flex items-center space-x-2"><Icon name="Play" size={16} fill="currentColor" /><span>Play Now</span></button>
+                                            <button onClick={() => playSong(SONGS[0])} class="w-max px-6 py-2 bg-white text-black rounded-full font-bold flex items-center space-x-2">
+                                                <PlayPauseIcon isPlaying={isPlaying && currentSong.id === SONGS[0].id} size={16} />
+                                                <span>Play Now</span>
+                                            </button>
                                         </GlassCard>
                                         <section>
                                             <h3 class="text-lg font-bold mb-4">Trending Now</h3>
@@ -405,6 +428,9 @@
                                                             <img src={s.cover} class="rounded-2xl mb-2 aspect-square object-cover" />
                                                             <h4 class="font-bold text-sm truncate">{s.title}</h4>
                                                             <p class="text-xs text-white/40">{s.artist}</p>
+                                                            <div class="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                <PlayPauseIcon isPlaying={isPlaying && currentSong.id === s.id} size={24} className="text-primary" />
+                                                            </div>
                                                             <button onClick={(e) => toggleLike(s.id, e)} class="absolute top-4 right-4">
                                                                 <HeartIcon filled={userLikedSongs.includes(s.id)} size={18} className={userLikedSongs.includes(s.id) ? "text-pink-500" : "text-white/40"} />
                                                             </button>
@@ -420,7 +446,18 @@
                                         <h2 class="text-3xl font-black tracking-tighter">Search</h2>
                                         <div class="relative"><Icon name="Search" className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" /><input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 outline-none" placeholder="Songs, artists..." /></div>
                                         <div class="space-y-2">
-                                            {filteredSongs.map(s => <div key={s.id} onClick={() => playSong(s)} class="flex items-center space-x-4 p-2 glass-card cursor-pointer group transition-all hover:bg-white/10"><img src={s.cover} class="w-12 h-12 rounded-xl object-cover" /><div><p class="font-bold">{s.title}</p><p class="text-xs text-white/40">{s.artist}</p></div><div class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity"><Icon name="Play" fill="currentColor" size={20} /></div></div>)}
+                                            {filteredSongs.map(s => (
+                                                <div key={s.id} onClick={() => playSong(s)} class="flex items-center space-x-4 p-2 glass-card cursor-pointer group transition-all hover:bg-white/10">
+                                                    <img src={s.cover} class="w-12 h-12 rounded-xl object-cover" />
+                                                    <div>
+                                                        <p class="font-bold">{s.title}</p>
+                                                        <p class="text-xs text-white/40">{s.artist}</p>
+                                                    </div>
+                                                    <div class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <PlayPauseIcon isPlaying={isPlaying && currentSong.id === s.id} size={20} className="text-primary" />
+                                                    </div>
+                                                </div>
+                                            ))}
                                         </div>
                                     </div>
                                 )}
@@ -576,7 +613,9 @@
                                     <button onClick={(e) => toggleLike(currentSong.id, e)}>
                                         <HeartIcon filled={userLikedSongs.includes(currentSong.id)} size={20} className={userLikedSongs.includes(currentSong.id) ? "text-pink-500" : "text-white/30"} />
                                     </button>
-                                    <button onClick={togglePlay}><Icon name={isPlaying ? "Pause" : "Play"} size={32} fill="currentColor" /></button>
+                                    <button onClick={togglePlay}>
+                                        <PlayPauseIcon isPlaying={isPlaying} size={32} />
+                                    </button>
                                 </div>
                                 <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-white/10 rounded-full overflow-hidden mx-3"><div class="h-full bg-primary" style={{ width: `${(currentTime/duration)*100}%` }}></div></div>
                             </div>
@@ -618,7 +657,9 @@
                                     </div>
                                     <div class="flex items-center justify-center space-x-12">
                                         <button onClick={prevSong} class="text-white/80 hover:text-white transition-colors"><Icon name="SkipBack" size={40} fill="currentColor" /></button>
-                                        <button onClick={togglePlay} class="w-24 h-24 bg-white text-black rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:scale-105 active:scale-95 transition-all"><Icon name={isPlaying ? "Pause" : "Play"} size={48} fill="currentColor" className={isPlaying ? "" : "ml-2"} /></button>
+                                        <button onClick={togglePlay} class="w-24 h-24 bg-white text-black rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:scale-105 active:scale-95 transition-all">
+                                            <PlayPauseIcon isPlaying={isPlaying} size={48} className={isPlaying ? "" : "ml-2"} />
+                                        </button>
                                         <button onClick={nextSong} class="text-white/80 hover:text-white transition-colors"><Icon name="SkipForward" size={40} fill="currentColor" /></button>
                                     </div>
                                 </div>
