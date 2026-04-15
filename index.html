@@ -92,17 +92,26 @@
         const { useState, useEffect, useRef, useMemo } = React;
 
         const SONGS = [
-            { id: 1, title: "Bairan", artist: "Banjaare", url: "https://videotourl.com/audio/1776109481203-67d03f4c-5547-4aca-81d6-ea83452ff15c.mp3", cover: "https://pub-1407f82391df4ab1951418d04be76914.r2.dev/uploads/f12fdd3f-3153-4c4d-8fde-ae39d7cbf0f9.jpg" },
-            { id: 2, title: "Tere bin", artist: "Aviverse", url: "https://videotourl.com/audio/1776110108022-27ce4664-af77-4eee-8726-14cdc6027a64.mp3", cover: "https://pub-1407f82391df4ab1951418d04be76914.r2.dev/uploads/8297129c-065a-4090-90c9-ef156d78b142.webp" },
-            { id: 3, title: "Arz kiya hai", artist: "Anuv jain", url: "https://videotourl.com/audio/1776111879123-8b019908-8aa0-4920-82ad-614f7205ab5b.mp3", cover: "https://pub-1407f82391df4ab1951418d04be76914.r2.dev/uploads/5e5a0c56-c8a1-44c5-a50a-5687c29cd6d9.jpg" },
-            { id: 4, title: "Dooron Dooron", artist: "Paresh Pahuja", url: "https://videotourl.com/audio/1776112196382-cc7d258a-bc81-4aac-9794-5969b7185d78.mp3", cover: "https://pub-1407f82391df4ab1951418d04be76914.r2.dev/uploads/faa5ceba-c6ee-43a6-b79a-e17331baf3bb.jpg" },
-            { id: 5, title: "Thodi si daru", artist: "AP dhillon", url: "https://videotourl.com/audio/1776115149643-defb9cc5-6f9f-4d12-9095-d87f359e0b8c.mp3", cover: "https://pub-1407f82391df4ab1951418d04be76914.r2.dev/uploads/bc293ffb-b75b-4ef0-954a-76a115a0c1d9.jpg" },
+            { id: 1, title: "Bairan", artist: "Banjaare", artistId: "banjaare", url: "https://videotourl.com/audio/1776109481203-67d03f4c-5547-4aca-81d6-ea83452ff15c.mp3", cover: "https://pub-1407f82391df4ab1951418d04be76914.r2.dev/uploads/f12fdd3f-3153-4c4d-8fde-ae39d7cbf0f9.jpg" },
+            { id: 2, title: "Tere bin", artist: "Aviverse", artistId: "aviverse", url: "https://videotourl.com/audio/1776110108022-27ce4664-af77-4eee-8726-14cdc6027a64.mp3", cover: "https://pub-1407f82391df4ab1951418d04be76914.r2.dev/uploads/8297129c-065a-4090-90c9-ef156d78b142.webp" },
+            { id: 3, title: "Arz kiya hai", artist: "Anuv jain", artistId: "anuvjain", url: "https://videotourl.com/audio/1776111879123-8b019908-8aa0-4920-82ad-614f7205ab5b.mp3", cover: "https://pub-1407f82391df4ab1951418d04be76914.r2.dev/uploads/5e5a0c56-c8a1-44c5-a50a-5687c29cd6d9.jpg" },
+            { id: 4, title: "Dooron Dooron", artist: "Paresh Pahuja", artistId: "paresh", url: "https://videotourl.com/audio/1776112196382-cc7d258a-bc81-4aac-9794-5969b7185d78.mp3", cover: "https://pub-1407f82391df4ab1951418d04be76914.r2.dev/uploads/faa5ceba-c6ee-43a6-b79a-e17331baf3bb.jpg" },
+            { id: 5, title: "Thodi si daru", artist: "AP dhillon", artistId: "apdhillon", url: "https://videotourl.com/audio/1776115149643-defb9cc5-6f9f-4d12-9095-d87f359e0b8c.mp3", cover: "https://pub-1407f82391df4ab1951418d04be76914.r2.dev/uploads/bc293ffb-b75b-4ef0-954a-76a115a0c1d9.jpg" },
             // Hidden songs for search only
-            { id: 6, title: "Ishq bulaava", artist: "Sidharth, Parineeti", url: "https://videotourl.com/audio/1776187153183-f9d81675-26f5-4447-a7db-108537a17e80.mp3", cover: "https://pub-1407f82391df4ab1951418d04be76914.r2.dev/uploads/33fe8577-c9eb-4779-b599-0f90d65369dd.jpg", hidden: true },
-            { id: 7, title: "bargad", artist: "sufr ft Arpit Bala", url: "https://videotourl.com/audio/1776187892763-5f12cc3e-45b4-4b1a-9e6e-4e2d140c4464.mp3", cover: "https://pub-1407f82391df4ab1951418d04be76914.r2.dev/uploads/46ad4e08-50e0-4328-b945-aa7eae499568.jpg", hidden: true },
-            { id: 8, title: "Tu Na Samjhe", artist: "Raja", url: "https://videotourl.com/audio/1776188228738-5fd98c61-0562-4abc-916e-83fede0428cf.mp3", cover: "https://pub-1407f82391df4ab1951418d04be76914.r2.dev/uploads/35f0f55a-911d-47ac-8f66-c4c6518a8e44.jpg", hidden: true },
-            { id: 9, title: "Jo tum mere ho", artist: "Anuv jain", url: "https://videotourl.com/audio/1776190512375-0d4d93bb-8c59-4794-9acd-ec28d24d6350.mp3", cover: "https://pub-1407f82391df4ab1951418d04be76914.r2.dev/uploads/84e271d0-dc0b-4b2e-af8b-0136fc2717e3.jpg", hidden: true },
-            { id: 10, title: "Wanna be yours", artist: "Arctic Monkeys", url: "https://videotourl.com/audio/1776191081130-d478531b-22f8-4277-9107-92d305e6b07e.mp3", cover: "https://pub-1407f82391df4ab1951418d04be76914.r2.dev/uploads/36d73c13-6e34-4963-bcae-0d60e3630b5b.jpg", hidden: true }
+            { id: 6, title: "Stay", artist: "Justin Bieber", artistId: "justinbieber", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", cover: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400", hidden: true },
+            { id: 7, title: "Starboy", artist: "The Weeknd", artistId: "theweeknd", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3", cover: "https://images.unsplash.com/photo-1493225255756-d9584f8606e9?w=400", hidden: true },
+            { id: 8, title: "Perfect", artist: "Ed Sheeran", artistId: "edsheeran", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3", cover: "https://images.unsplash.com/photo-1514525253361-bee8718a747c?w=400", hidden: true },
+            { id: 9, title: "Believer", artist: "Imagine Dragons", artistId: "imaginedragons", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3", cover: "https://images.unsplash.com/photo-1459749411177-042180ce673c?w=400", hidden: true },
+            { id: 10, title: "Heat Waves", artist: "Glass Animals", artistId: "glassanimals", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3", cover: "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=400", hidden: true }
+        ];
+
+        const ARTISTS = [
+            { id: "banjaare", name: "Banjaare", image: "https://pub-1407f82391df4ab1951418d04be76914.r2.dev/uploads/66df9178-185a-4f7d-ac4a-f50f3218f5bf.jpg" },
+            { id: "aviverse", name: "Aviverse", image: "https://pub-1407f82391df4ab1951418d04be76914.r2.dev/uploads/5e1148fc-7ba3-46fa-ac83-288ca33acee3.jpg" },
+            { id: "anuvjain", name: "Anuv Jain", image: "https://pub-1407f82391df4ab1951418d04be76914.r2.dev/uploads/c9a27e88-fe8e-4595-b9ae-eea6670f8b9b.jpg" },
+            { id: "paresh", name: "Paresh Pahuja", image: "https://pub-1407f82391df4ab1951418d04be76914.r2.dev/uploads/a0a8dcd2-6d27-4d17-a58d-4b2b6138ae4a.jpg" },
+            { id: "apdhillon", name: "AP Dhillon", image: "https://pub-1407f82391df4ab1951418d04be76914.r2.dev/uploads/cee559b8-ecdd-4697-be71-a02ffd5888d7.jpg" },
+            { id: "theweeknd", name: "The Weeknd", image: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400" }
         ];
 
         const NOTIFICATIONS = [
@@ -182,6 +191,12 @@
             const [editData, setEditData] = useState({ name: '', image: '' });
             const [isSettingsOpen, setIsSettingsOpen] = useState(false);
             const [isHelpOpen, setIsHelpOpen] = useState(false);
+            const [selectedArtist, setSelectedArtist] = useState(null);
+
+            // Clear selected artist when tab changes
+            useEffect(() => {
+                setSelectedArtist(null);
+            }, [activeTab]);
 
             const audioRef = useRef(new Audio());
 
@@ -393,120 +408,203 @@
                     <main class="max-w-lg mx-auto h-screen pb-48 pt-12 px-6 overflow-y-auto hide-scrollbar">
                         <AnimatePresence mode="wait">
                             <motion.div key={activeTab} initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }}>
-                                {activeTab === "home" && (
-                                    <div class="space-y-8">
-                                        <header class="flex items-center justify-between">
-                                            <div class="flex items-center space-x-3">
-                                                <svg viewBox="0 0 100 100" class="w-10 h-10 logo-s">
-                                                    <path d="M80 25 C80 25 20 25 20 25 C20 25 20 50 50 50 C80 50 80 75 80 75 C80 75 20 75 20 75" fill="none" stroke="url(#logo-grad-s)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
-                                                </svg>
-                                                <h2 class="text-2xl font-black tracking-tighter">Sunozara</h2>
-                                            </div>
-                                            <button onClick={() => setIsNotificationsOpen(!isNotificationsOpen)} class="p-3 glass-card relative">
-                                                <Icon name="Bell" />
-                                                <span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full shadow-[0_0_8px_#b026ff]"></span>
+                                {selectedArtist ? (
+                                    <div class="space-y-8 pb-20">
+                                        <header class="flex items-center space-x-4">
+                                            <button onClick={() => setSelectedArtist(null)} class="p-3 glass-card">
+                                                <Icon name="ArrowLeft" />
                                             </button>
+                                            <h2 class="text-xl font-black">Artist Profile</h2>
                                         </header>
-                                        {isNotificationsOpen && (
-                                            <div class="glass-card p-4 space-y-2 text-sm border-primary/20">
-                                                {NOTIFICATIONS.map(n => <p key={n.id} class="border-b border-white/5 pb-2 last:border-0">{n.text}</p>)}
+
+                                        <div class="relative w-full aspect-[4/3] rounded-[40px] overflow-hidden group">
+                                            <img src={selectedArtist.image} class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                            <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+                                            <div class="absolute bottom-6 left-6 right-6">
+                                                <motion.h1 
+                                                    initial={{ opacity: 0, x: -20 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    class="text-4xl font-black tracking-tighter"
+                                                >
+                                                    {selectedArtist.name}
+                                                </motion.h1>
+                                                <p class="text-white/60 font-medium">Verified Artist</p>
                                             </div>
-                                        )}
-                                        <GlassCard className="h-48 bg-gradient-to-br from-primary/40 to-secondary/20 p-6 flex flex-col justify-end">
-                                            <h3 class="text-3xl font-black mb-4">Euphoric Dreams</h3>
-                                            <button onClick={() => playSong(SONGS[0])} class="w-max px-6 py-2 bg-white text-black rounded-full font-bold flex items-center space-x-2">
-                                                <PlayPauseIcon isPlaying={isPlaying && currentSong.id === SONGS[0].id} size={16} />
-                                                <span>Play Now</span>
-                                            </button>
-                                        </GlassCard>
-                                        <section>
-                                            <h3 class="text-lg font-bold mb-4">Trending Now</h3>
-                                            <div class="flex space-x-4 overflow-x-auto hide-scrollbar pb-2">
-                                                {SONGS.filter(s => !s.hidden).map(s => (
-                                                    <div key={s.id} onClick={() => playSong(s)} class="flex-shrink-0 w-40 cursor-pointer">
-                                                        <GlassCard className="p-3 relative">
-                                                            <img src={s.cover} class="rounded-2xl mb-2 aspect-square object-cover" />
-                                                            <h4 class="font-bold text-sm truncate">{s.title}</h4>
-                                                            <p class="text-xs text-white/40">{s.artist}</p>
-                                                            <div class="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                <PlayPauseIcon isPlaying={isPlaying && currentSong.id === s.id} size={24} className="text-primary" />
-                                                            </div>
-                                                            <button onClick={(e) => toggleLike(s.id, e)} class="absolute top-4 right-4">
-                                                                <HeartIcon filled={userLikedSongs.includes(s.id)} size={18} className={userLikedSongs.includes(s.id) ? "text-pink-500" : "text-white/40"} />
+                                        </div>
+
+                                        <div class="space-y-4">
+                                            <div class="flex items-center justify-between">
+                                                <h3 class="text-lg font-bold">Popular Tracks</h3>
+                                                <button class="text-primary text-xs font-bold uppercase tracking-widest">Play All</button>
+                                            </div>
+                                            <div class="space-y-3">
+                                                {SONGS.filter(s => s.artistId === selectedArtist.id).map((s, index) => (
+                                                    <div 
+                                                        key={s.id} 
+                                                        onClick={() => playSong(s)} 
+                                                        class="flex items-center space-x-4 p-3 glass-card cursor-pointer group hover:bg-white/10 transition-colors"
+                                                    >
+                                                        <span class="w-4 text-xs font-black opacity-20">{index + 1}</span>
+                                                        <img src={s.cover} class="w-12 h-12 rounded-xl object-cover" />
+                                                        <div class="flex-1 min-w-0">
+                                                            <p class="font-bold text-sm truncate">{s.title}</p>
+                                                            <p class="text-xs text-white/40 truncate">{s.artist}</p>
+                                                        </div>
+                                                        <div class="flex items-center space-x-3">
+                                                            <button onClick={(e) => toggleLike(s.id, e)}>
+                                                                <HeartIcon filled={userLikedSongs.includes(s.id)} size={16} className={userLikedSongs.includes(s.id) ? "text-pink-500" : "text-white/20"} />
                                                             </button>
-                                                        </GlassCard>
+                                                            <div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                <PlayPauseIcon isPlaying={isPlaying && currentSong.id === s.id} size={16} className="text-primary" />
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 ))}
+                                                {SONGS.filter(s => s.artistId === selectedArtist.id).length === 0 && (
+                                                    <p class="text-center text-white/20 py-10">No songs found for this artist.</p>
+                                                )}
                                             </div>
-                                        </section>
+                                        </div>
                                     </div>
-                                )}
-                                {activeTab === "search" && (
-                                    <div class="space-y-6 min-h-[calc(100vh-200px)] pb-20">
-                                        <h2 class="text-3xl font-black tracking-tighter">Search</h2>
-                                        <div class="relative"><Icon name="Search" className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" /><input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 outline-none" placeholder="Songs, artists..." /></div>
-                                        <div class="space-y-2">
-                                            {filteredSongs.map(s => (
-                                                <div key={s.id} onClick={() => playSong(s)} class="flex items-center space-x-4 p-2 glass-card cursor-pointer group transition-all hover:bg-white/10">
-                                                    <img src={s.cover} class="w-12 h-12 rounded-xl object-cover" />
-                                                    <div>
-                                                        <p class="font-bold">{s.title}</p>
-                                                        <p class="text-xs text-white/40">{s.artist}</p>
+                                ) : (
+                                    <>
+                                        {activeTab === "home" && (
+                                            <div class="space-y-8">
+                                                <header class="flex items-center justify-between">
+                                                    <div class="flex items-center space-x-3">
+                                                        <svg viewBox="0 0 100 100" class="w-10 h-10 logo-s">
+                                                            <path d="M80 25 C80 25 20 25 20 25 C20 25 20 50 50 50 C80 50 80 75 80 75 C80 75 20 75 20 75" fill="none" stroke="url(#logo-grad-s)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+                                                        </svg>
+                                                        <h2 class="text-2xl font-black tracking-tighter">Sunozara</h2>
                                                     </div>
-                                                    <div class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        <PlayPauseIcon isPlaying={isPlaying && currentSong.id === s.id} size={20} className="text-primary" />
+                                                    <button onClick={() => setIsNotificationsOpen(!isNotificationsOpen)} class="p-3 glass-card relative">
+                                                        <Icon name="Bell" />
+                                                        <span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full shadow-[0_0_8px_#b026ff]"></span>
+                                                    </button>
+                                                </header>
+                                                {isNotificationsOpen && (
+                                                    <div class="glass-card p-4 space-y-2 text-sm border-primary/20">
+                                                        {NOTIFICATIONS.map(n => <p key={n.id} class="border-b border-white/5 pb-2 last:border-0">{n.text}</p>)}
                                                     </div>
+                                                )}
+                                                <GlassCard className="h-48 bg-gradient-to-br from-primary/40 to-secondary/20 p-6 flex flex-col justify-end">
+                                                    <h3 class="text-3xl font-black mb-4">Euphoric Dreams</h3>
+                                                    <button onClick={() => playSong(SONGS[0])} class="w-max px-6 py-2 bg-white text-black rounded-full font-bold flex items-center space-x-2">
+                                                        <PlayPauseIcon isPlaying={isPlaying && currentSong.id === SONGS[0].id} size={16} />
+                                                        <span>Play Now</span>
+                                                    </button>
+                                                </GlassCard>
+                                                <section>
+                                                    <h3 class="text-lg font-bold mb-4">Trending Now</h3>
+                                                    <div class="flex space-x-4 overflow-x-auto hide-scrollbar pb-2">
+                                                        {SONGS.filter(s => !s.hidden).map(s => (
+                                                            <div key={s.id} onClick={() => playSong(s)} class="flex-shrink-0 w-40 cursor-pointer">
+                                                                <GlassCard className="p-3 relative group">
+                                                                    <img src={s.cover} class="rounded-2xl mb-2 aspect-square object-cover" />
+                                                                    <h4 class="font-bold text-sm truncate">{s.title}</h4>
+                                                                    <p class="text-xs text-white/40">{s.artist}</p>
+                                                                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 rounded-2xl">
+                                                                        <PlayPauseIcon isPlaying={isPlaying && currentSong.id === s.id} size={32} className="text-white" />
+                                                                    </div>
+                                                                    <button onClick={(e) => toggleLike(s.id, e)} class="absolute top-4 right-4">
+                                                                        <HeartIcon filled={userLikedSongs.includes(s.id)} size={18} className={userLikedSongs.includes(s.id) ? "text-pink-500" : "text-white/40"} />
+                                                                    </button>
+                                                                </GlassCard>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </section>
+
+                                                <section>
+                                                    <h3 class="text-lg font-bold mb-4">Artists</h3>
+                                                    <div class="flex space-x-6 overflow-x-auto hide-scrollbar pb-4 snap-x">
+                                                        {ARTISTS.map(artist => (
+                                                            <motion.div 
+                                                                key={artist.id} 
+                                                                onClick={() => setSelectedArtist(artist)}
+                                                                whileHover={{ scale: 1.05 }}
+                                                                whileTap={{ scale: 0.95 }}
+                                                                class="flex-shrink-0 w-28 cursor-pointer text-center snap-start"
+                                                            >
+                                                                <div class="relative mb-3 group">
+                                                                    <div class="absolute inset-0 bg-primary/20 rounded-full blur-lg opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                                                    <img src={artist.image} class="w-28 h-28 rounded-full object-cover border-2 border-white/5 group-hover:border-primary/50 transition-colors" />
+                                                                </div>
+                                                                <h4 class="font-bold text-sm truncate">{artist.name}</h4>
+                                                            </motion.div>
+                                                        ))}
+                                                    </div>
+                                                </section>
+                                            </div>
+                                        )}
+                                        {activeTab === "search" && (
+                                            <div class="space-y-6 min-h-[calc(100vh-200px)] pb-20">
+                                                <h2 class="text-3xl font-black tracking-tighter">Search</h2>
+                                                <div class="relative"><Icon name="Search" className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" /><input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 outline-none" placeholder="Songs, artists..." /></div>
+                                                <div class="space-y-2">
+                                                    {filteredSongs.map(s => (
+                                                        <div key={s.id} onClick={() => playSong(s)} class="flex items-center space-x-4 p-2 glass-card cursor-pointer group transition-all hover:bg-white/10">
+                                                            <img src={s.cover} class="w-12 h-12 rounded-xl object-cover" />
+                                                            <div>
+                                                                <p class="font-bold">{s.title}</p>
+                                                                <p class="text-xs text-white/40">{s.artist}</p>
+                                                            </div>
+                                                            <div class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                <PlayPauseIcon isPlaying={isPlaying && currentSong.id === s.id} size={20} className="text-primary" />
+                                                            </div>
+                                                        </div>
+                                                    ))}
                                                 </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                                {activeTab === "library" && (
-                                    <div class="space-y-6">
-                                        <h2 class="text-3xl font-black tracking-tighter">Library</h2>
-                                        <div class="grid grid-cols-2 gap-4">
-                                            <GlassCard className="p-6 bg-primary/20 border-primary/30"><Icon name="Heart" fill="currentColor" className="text-pink-500 mb-2" /><h3>Liked</h3><p class="text-xs opacity-40">{userLikedSongs.length} tracks</p></GlassCard>
-                                            <GlassCard className="p-6"><Icon name="ListMusic" className="text-primary mb-2" /><h3>Playlists</h3><p class="text-xs opacity-40">0 created</p></GlassCard>
-                                        </div>
-                                        <div class="space-y-2 pt-4">
-                                            {SONGS.filter(s => userLikedSongs.includes(s.id)).map(s => (
-                                                <div key={s.id} onClick={() => playSong(s)} class="flex items-center space-x-4 p-2 cursor-pointer border-b border-white/5 last:border-0 hover:bg-white/5 rounded-xl transition-colors">
-                                                    <img src={s.cover} class="w-12 h-12 rounded-lg object-cover" />
-                                                    <div>
-                                                        <p class="text-sm font-bold">{s.title}</p>
-                                                        <p class="text-xs opacity-40">{s.artist}</p>
-                                                    </div>
-                                                    <button onClick={(e) => toggleLike(s.id, e)} class="ml-auto">
-                                                        <HeartIcon filled={true} size={18} className="text-pink-500" />
+                                            </div>
+                                        )}
+                                        {activeTab === "library" && (
+                                            <div class="space-y-6">
+                                                <h2 class="text-3xl font-black tracking-tighter">Library</h2>
+                                                <div class="grid grid-cols-2 gap-4">
+                                                    <GlassCard className="p-6 bg-primary/20 border-primary/30"><Icon name="Heart" fill="currentColor" className="text-pink-500 mb-2" /><h3>Liked</h3><p class="text-xs opacity-40">{userLikedSongs.length} tracks</p></GlassCard>
+                                                    <GlassCard className="p-6"><Icon name="ListMusic" className="text-primary mb-2" /><h3>Playlists</h3><p class="text-xs opacity-40">0 created</p></GlassCard>
+                                                </div>
+                                                <div class="space-y-2 pt-4">
+                                                    {SONGS.filter(s => userLikedSongs.includes(s.id)).map(s => (
+                                                        <div key={s.id} onClick={() => playSong(s)} class="flex items-center space-x-4 p-2 cursor-pointer border-b border-white/5 last:border-0 hover:bg-white/5 rounded-xl transition-colors">
+                                                            <img src={s.cover} class="w-12 h-12 rounded-lg object-cover" />
+                                                            <div>
+                                                                <p class="text-sm font-bold">{s.title}</p>
+                                                                <p class="text-xs opacity-40">{s.artist}</p>
+                                                            </div>
+                                                            <button onClick={(e) => toggleLike(s.id, e)} class="ml-auto">
+                                                                <HeartIcon filled={true} size={18} className="text-pink-500" />
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                    {userLikedSongs.length === 0 && <p class="text-center text-white/20 py-10 font-medium">No liked songs yet.</p>}
+                                                </div>
+                                            </div>
+                                        )}
+                                        {activeTab === "profile" && (
+                                            <div class="flex flex-col items-center space-y-6">
+                                                <div class="relative group">
+                                                    <img src={currentProfile.image || "https://pub-1407f82391df4ab1951418d04be76914.r2.dev/uploads/20d2dd3a-e02c-4aaf-8439-c84c578b2b49.jpg"} class="w-32 h-32 rounded-full border-4 border-primary/20 p-1 object-cover" />
+                                                    <button onClick={() => setIsEditProfile(true)} class="absolute bottom-0 right-0 p-2 bg-primary rounded-full shadow-xl"><Icon name="Camera" size={16} /></button>
+                                                </div>
+                                                <div class="text-center">
+                                                    <h2 class="text-3xl font-black">{currentProfile.name}</h2>
+                                                    <p class="text-white/40 text-sm">@{currentUser.username}</p>
+                                                </div>
+                                                
+                                                <div class="w-full space-y-3">
+                                                    <button onClick={() => setIsEditProfile(true)} class="w-full p-4 glass-card flex items-center justify-between group">
+                                                        <div class="flex items-center space-x-3"><Icon name="User" className="text-primary" /><span>Edit Profile</span></div>
+                                                        <Icon name="ChevronRight" size={18} className="opacity-40 group-hover:translate-x-1 transition-transform" />
+                                                    </button>
+                                                    <button onClick={() => setIsSettingsOpen(true)} class="w-full p-4 glass-card flex items-center justify-between group">
+                                                        <div class="flex items-center space-x-3"><Icon name="Settings" className="text-primary" /><span>Settings</span></div>
+                                                        <Icon name="ChevronRight" size={18} className="opacity-40 group-hover:translate-x-1 transition-transform" />
                                                     </button>
                                                 </div>
-                                            ))}
-                                            {userLikedSongs.length === 0 && <p class="text-center text-white/20 py-10 font-medium">No liked songs yet.</p>}
-                                        </div>
-                                    </div>
-                                )}
-                                {activeTab === "profile" && (
-                                    <div class="flex flex-col items-center space-y-6">
-                                        <div class="relative group">
-                                            <img src={currentProfile.image || "https://pub-1407f82391df4ab1951418d04be76914.r2.dev/uploads/20d2dd3a-e02c-4aaf-8439-c84c578b2b49.jpg"} class="w-32 h-32 rounded-full border-4 border-primary/20 p-1 object-cover" />
-                                            <button onClick={() => setIsEditProfile(true)} class="absolute bottom-0 right-0 p-2 bg-primary rounded-full shadow-xl"><Icon name="Camera" size={16} /></button>
-                                        </div>
-                                        <div class="text-center">
-                                            <h2 class="text-3xl font-black">{currentProfile.name}</h2>
-                                            <p class="text-white/40 text-sm">@{currentUser.username}</p>
-                                        </div>
-                                        
-                                        <div class="w-full space-y-3">
-                                            <button onClick={() => setIsEditProfile(true)} class="w-full p-4 glass-card flex items-center justify-between group">
-                                                <div class="flex items-center space-x-3"><Icon name="User" className="text-primary" /><span>Edit Profile</span></div>
-                                                <Icon name="ChevronRight" size={18} className="opacity-40 group-hover:translate-x-1 transition-transform" />
-                                            </button>
-                                            <button onClick={() => setIsSettingsOpen(true)} class="w-full p-4 glass-card flex items-center justify-between group">
-                                                <div class="flex items-center space-x-3"><Icon name="Settings" className="text-primary" /><span>Settings</span></div>
-                                                <Icon name="ChevronRight" size={18} className="opacity-40 group-hover:translate-x-1 transition-transform" />
-                                            </button>
-                                        </div>
-                                    </div>
+                                            </div>
+                                        )}
+                                    </>
                                 )}
                             </motion.div>
                         </AnimatePresence>
